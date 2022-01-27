@@ -34,6 +34,7 @@ module FigBox : sig
   val glass-box: (float * float)?-> length -> length -> figbox -> figbox
   val frame: length -> color -> figbox -> figbox
   val bgcolor: color -> figbox -> figbox
+  val overlay: point -> figbox -> figbox -> figbox
 
   val rotate: float -> figbox -> figbox
   val scale: float?-> float -> figbox -> figbox
@@ -385,6 +386,18 @@ end = struct
         fill clr (Gr.rectangle (x, y -' dp) (x +' wid, y +' ht));
         draw-text (x, y) ib-fig;
       ])
+    in
+    Box(embedf)
+
+  let overlay (dx, dy) over base =
+    let embedf ctx =
+      let ib-base = embed-figbox ctx base in
+      let (wid, ht, dp) = get-natural-metrics ib-base in
+      let ib-over = embed-figbox ctx over in
+        inline-graphics wid ht dp (fun (x, y) -> [
+          draw-text (x, y) ib-base;
+          draw-text (x +' dx, y +' dy) ib-over;
+        ])
     in
     Box(embedf)
 
